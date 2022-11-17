@@ -1,17 +1,31 @@
 pipeline {
-     agent { label 'NODE' }
-     stages {
-        stage('vcs') {
-            steps {
-             git branch: 'main', 
-             url: 'https://github.com/bharathireddygithub/spring-petclinic.git'
-            }
+    agent {
+  label 'node'
+}
+stages {
+    stage ('git') {
+        steps {
+            git branch: 'main',
+            url: 'https://github.com/bharathireddygithub/spring-petclinic.git'
         }
-        stage('build') {
+       
+    }
+     stage ('build') {
             steps {
                 sh 'mvn package'
             }
+            
         }
-        stage( )
-     }
+        stage ('artifactory') {
+            steps {
+                archiveArtifacts artifacts: '**/target/*.jar'
+            
+            }
+        }
+        stage ('test repots') {
+            steps {
+                 junit '**/target/surefire-reports/*.xml'
+            }
+        }
+}
 }

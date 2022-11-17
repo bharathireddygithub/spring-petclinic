@@ -1,0 +1,27 @@
+pipeline {
+     agent { label 'NODE' }
+      choice(name: 'BRANCH_BUILD', choices: ['main', 'dev', 'release'], description: 'Pick something')
+     stages {
+        stage('vcs') {
+            steps {
+             git branch: "${'BRANCH_BUILD'}",
+             url: 'https://github.com/bharathireddygithub/spring-petclinic.git'
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage('artifacts') {
+            steps {
+                archiveArtifacts artifacts: '**/target/*.jar'
+            }
+        }
+        stage('testreports') {
+            steps {
+                junit '**/target/surefire-reports/*.xml'
+            }
+        }
+    }
+}
